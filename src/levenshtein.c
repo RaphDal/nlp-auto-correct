@@ -39,8 +39,8 @@ size_t minimum(size_t matrix[], size_t n, size_t i, size_t j)
 
 size_t levenshtein_distance(char *word, char *compared)
 {
-    size_t m = strlen(word);
-    size_t n = strlen(compared);
+    size_t m = strlen(word) + 1;
+    size_t n = strlen(compared) + 1;
     size_t matrix[m][n];
 
     for (size_t i = 0; i < m; i++)
@@ -49,7 +49,7 @@ size_t levenshtein_distance(char *word, char *compared)
         matrix[0][i] = i;
     for (size_t i = 1; i < m; i++) {
         for (size_t j = 1; j < n; j++)
-            matrix[i][j] = minimum(matrix, n, i, j) + (word[i] != compared[j]);
+            matrix[i][j] = minimum(matrix, n, i, j) + (word[i - 1] != compared[j - 1]);
     }
     return (matrix[m - 1][n - 1]);
 }

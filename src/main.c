@@ -31,8 +31,6 @@ int main(int argc, char **argv)
     size_t size = 0;
     int res;
 
-    levenshtein_distance("edward", "edwin");
-    return (0);
     while (1) {
         res = getline(&line, &size, stdin);
         if (res == -1)
