@@ -20,25 +20,36 @@
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "token.h"
-size_t levenshtein_distance(char *word, char *compared);
+#include <string.h>
+#include <unistd.h>
 
-int main(int argc, char **argv)
+size_t minimum(size_t matrix[], size_t n, size_t i, size_t j)
 {
-    char *line = NULL;
-    size_t size = 0;
-    int res;
+    size_t diag = (i - 1) * n + (j - 1);
+    size_t top = (i - 1) * n + j;
+    size_t left = i * n + (j - 1);
+    size_t minimum = matrix[diag];
 
-    levenshtein_distance("edward", "edwin");
-    return (0);
-    while (1) {
-        res = getline(&line, &size, stdin);
-        if (res == -1)
-            return (EXIT_SUCCESS);
-        line[res - 1] = 0;
-        tokenize(line);
+    if (matrix[top] < minimum)
+        minimum = matrix[top];
+    if (matrix[left] < minimum)
+        minimum = matrix[left];
+    return (minimum);
+}
+
+size_t levenshtein_distance(char *word, char *compared)
+{
+    size_t m = strlen(word);
+    size_t n = strlen(compared);
+    size_t matrix[m][n];
+
+    for (size_t i = 0; i < m; i++)
+        matrix[i][0] = i;
+    for (size_t i = 1; i < n; i++)
+        matrix[0][i] = i;
+    for (size_t i = 1; i < m; i++) {
+        for (size_t j = 1; j < n; j++)
+            matrix[i][j] = minimum(matrix, n, i, j) + (word[i] != compared[j]);
     }
-    return (0);
+    return (matrix[m - 1][n - 1]);
 }
