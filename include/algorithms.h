@@ -20,42 +20,22 @@
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "token.h"
-#include "algorithms.h"
+#ifndef ALGORITHME_H_
+#define ALGORITHME_H_
 
-int loop(char **dico)
-{
-    char *line = NULL;
-    char **tokens;
-    size_t size;
-    int res;
+static const int inc_buff = 16;
 
-    while (1) {
-        size = 0;
-        res = getline(&line, &size, stdin);
-        if (res == -1)
-            return (EXIT_SUCCESS);
-        line[res - 1] = 0;
-        if (!(tokens = tokenize(line)))
-            return (EXIT_FAILURE);
-        exploit(tokens, dico);
-        free(line);
-        line = NULL;
-    }
-    return (EXIT_SUCCESS);
-}
+static const int dico_inc_buff = 65536;
+
+#include <unistd.h>
+
+size_t levenshtein_distance(char *word, char *compared);
 
 
-int main(int argc, char **argv)
-{
-    char **dico;
+char **get_dico(char *filepath);
 
-    if (argc < 2 || !(dico = get_dico(argv[1]))) {
-        fprintf(stderr, "I need a dictionnary to compare the words !\n");
-        return (EXIT_FAILURE);
-    }
-    fprintf(stderr, "\n");
-    return (loop(dico));
-}
+
+void exploit(char **tokens, char **dico);
+
+
+#endif /* !ALGORITHME_H_ */

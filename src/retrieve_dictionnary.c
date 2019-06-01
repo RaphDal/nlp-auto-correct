@@ -20,69 +20,56 @@
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
 
-#include <stdbool.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include "algorithms.h"
 
-static bool is_word_char(char c)
+static int append_list(char ***res_ptr, size_t *nb_elems, char *word)
 {
-    return (c == '-' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
-}
+    char **words = *res_ptr;
 
-static void jump_escape(char **content)
-{
-    while (!is_word_char(**content) && **content)
-        (*content)++;
-}
-
-static char *dup_word(char **line)
-{
-    size_t len;
-    char *res;
-
-    for (len = 0; is_word_char((*line)[len]) && (*line)[len]; len++);
-    res = malloc(sizeof(char) * (len + 1));
-    if (!res)
-        return (NULL);
-    memcpy(res, *line, len);
-    res[len] = 0;
-    (*line) += len;
-    return (res);
-}
-
-static int add_element(char ***tokens_ptr,
-size_t *nb_elems, char **line_ptr)
-{
-    char **new_tokens = *tokens_ptr;
-
-    if ((*nb_elems)%inc_buff == 0) {
-        new_tokens = malloc(sizeof(char *) * ((*nb_elems) + inc_buff + 1));
-        if (!new_tokens)
+    if ((*nb_elems)%1000 == 0)
+        fprintf(stderr, "\r%lu words extracted !", *nb_elems);
+    if ((*nb_elems)%dico_inc_buff == 0) {
+        words = malloc(sizeof(char *) * ((*nb_elems) + dico_inc_buff + 1));
+        if (!words)
             return (-1);
-        if (*tokens_ptr) {
-            memcpy(new_tokens, *tokens_ptr, (*nb_elems) * sizeof(char *));
-            free(*tokens_ptr);
+        if (*res_ptr) {
+            memcpy(words, *res_ptr, (*nb_elems) * sizeof(char *));
+            free(*res_ptr);
         }
-        *tokens_ptr = new_tokens;
+        *res_ptr = words;
     }
-    if (!(new_tokens[*nb_elems] = dup_word(line_ptr)))
+    if (!(words[*nb_elems] = malloc(sizeof(char) * (strlen(word) + 1))))
         return (-1);
+    memcpy(words[*nb_elems], word, strlen(word));
+    words[*nb_elems][strlen(word)] = '\0';
     (*nb_elems)++;
     return (0);
-}
+} 
 
-char **tokenize(char *line)
+char **get_dico(char *filepath)
 {
-    char **tokens = NULL;
-    size_t nb_elems = 0;
+    FILE *dico = fopen(filepath, "r");
+    size_t size = 0;
+    char **res = NULL;
+    char *line = NULL;
+    size_t nb_elem = 0;
+    int ret = 0;
 
-    jump_escape(&line);
-    while (*line) {
-        if (add_element(&tokens, &nb_elems, &line))
+    if (!dico)
+        return (NULL);
+    while (ret != -1) {
+        size = 0;
+        if ((ret = getline(&line, &size, dico)) == -1)
+            break;
+        line[ret - 1] = '\0';
+        if (append_list(&res, &nb_elem, line))
             return (NULL);
-        jump_escape(&line);
+        free(line);
+        line = NULL;
     }
-    tokens[nb_elems] = NULL;
-    return (tokens);
+    res[nb_elem] = NULL;
+    return (res);
 }
