@@ -62,8 +62,10 @@ char **get_dico(char *filepath)
         return (NULL);
     while (ret != -1) {
         size = 0;
-        if ((ret = getline(&line, &size, dico)) == -1)
+        if ((ret = getline(&line, &size, dico)) == -1) {
+            free(line);
             break;
+        }
         line[ret - 1] = '\0';
         if (append_list(&res, &nb_elem, line))
             return (NULL);
@@ -71,5 +73,6 @@ char **get_dico(char *filepath)
         line = NULL;
     }
     res[nb_elem] = NULL;
+    fclose(dico);
     return (res);
 }

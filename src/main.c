@@ -35,8 +35,10 @@ int loop(char **dico)
     while (1) {
         size = 0;
         res = getline(&line, &size, stdin);
-        if (res == -1)
+        if (res == -1) {
+            free(line);
             return (EXIT_SUCCESS);
+        }
         line[res - 1] = 0;
         if (!(tokens = tokenize(line)))
             return (EXIT_FAILURE);
@@ -51,11 +53,16 @@ int loop(char **dico)
 int main(int argc, char **argv)
 {
     char **dico;
+    int back;
 
     if (argc < 2 || !(dico = get_dico(argv[1]))) {
         fprintf(stderr, "I need a dictionnary to compare the words !\n");
         return (EXIT_FAILURE);
     }
     fprintf(stderr, "\n");
-    return (loop(dico));
+    back = loop(dico);
+    for (size_t i = 0; dico[i]; i++)
+        free(dico[i]);
+    free(dico);
+    return (back);
 }
