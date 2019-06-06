@@ -35,7 +35,7 @@ size_t levenshtein_distance(char *word, char *compared);
 char **get_dico(char *filepath);
 
 
-void exploit(char **tokens, char **dico);
+void exploit(char **tokens, char **dico, size_t dico_size);
 
 
 #endif /* !ALGORITHME_H_ */

@@ -25,12 +25,22 @@
 #include "token.h"
 #include "algorithms.h"
 
+size_t list_size(char **arr)
+{
+    size_t i = 0;
+
+    while (arr[i])
+        i++;
+    return (i);
+}
+
 int loop(char **dico)
 {
     char *line = NULL;
     char **tokens;
     size_t size;
     int res;
+    size_t dico_size = list_size(dico);
 
     while (1) {
         size = 0;
@@ -42,7 +52,7 @@ int loop(char **dico)
         line[res - 1] = 0;
         if (!(tokens = tokenize(line)))
             return (EXIT_FAILURE);
-        exploit(tokens, dico);
+        exploit(tokens, dico, dico_size);
         free(line);
         line = NULL;
     }
