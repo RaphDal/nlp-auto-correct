@@ -20,24 +20,42 @@
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
 
-#ifndef ALGORITHME_H_
-#define ALGORITHME_H_
-
-static const int inc_buff = 16;
-
-static const int dico_inc_buff = 65536;
-
-#include <unistd.h>
+#include <stdio.h>
 #include "system.h"
+#include "algorithms.h"
 
-size_t levenshtein_distance(char *word, char *compared, system_t *sys);
-size_t damerau_levenshtein_distance(char *a, char *b);
+size_t list_size(char **arr)
+{
+    size_t i = 0;
 
+    while (arr[i])
+        i++;
+    return (i);
+}
 
-char **get_dico(char *filepath);
+system_t *system_init(char *dictionnary_path, char *keyboard_type)
+{
+    system_t *system;
+    char **dico = get_dico(dictionnary_path);
 
+    if (!dico) {
+        fprintf(stderr, "I need a dictionnary to compare the words !\n");
+        return (NULL);
+    }
+    if (!(system = malloc(sizeof(system_t))))
+        return (NULL);
+    system->dictionnary_size = list_size(dico);
+    system->dictionnary = dico;
+    if (get_keyboard(keyboard_type, system))
+        return (NULL);
+    return (system);
+}
 
-void exploit(char **tokens, system_t *sys);
+void system_destroy(system_t *sys)
+{
+    char **dico = sys->dictionnary;
 
-
-#endif /* !ALGORITHME_H_ */
+    for (size_t i = 0; dico[i]; i++)
+        free(dico[i]);
+    free(dico);
+}

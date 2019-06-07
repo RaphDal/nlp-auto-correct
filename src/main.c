@@ -24,23 +24,14 @@
 #include <stdlib.h>
 #include "token.h"
 #include "algorithms.h"
+#include "system.h"
 
-size_t list_size(char **arr)
-{
-    size_t i = 0;
-
-    while (arr[i])
-        i++;
-    return (i);
-}
-
-int loop(char **dico)
+int loop(system_t *sys)
 {
     char *line = NULL;
     char **tokens;
     size_t size;
     int res;
-    size_t dico_size = list_size(dico);
 
     while (1) {
         size = 0;
@@ -52,27 +43,25 @@ int loop(char **dico)
         line[res - 1] = 0;
         if (!(tokens = tokenize(line)))
             return (EXIT_FAILURE);
-        exploit(tokens, dico, dico_size);
+        exploit(tokens, sys);
         free(line);
         line = NULL;
     }
     return (EXIT_SUCCESS);
 }
 
-
 int main(int argc, char **argv)
 {
-    char **dico;
+    system_t *sys;
     int back;
 
-    if (argc < 2 || !(dico = get_dico(argv[1]))) {
-        fprintf(stderr, "I need a dictionnary to compare the words !\n");
+    if (argc < 3 || !(sys = system_init(argv[1], argv[2]))) {
+        if (argc < 3)
+            fprintf(stderr, "Need a dictonnary and a keyboard type !\n");
         return (EXIT_FAILURE);
     }
     fprintf(stderr, "\n");
-    back = loop(dico);
-    for (size_t i = 0; dico[i]; i++)
-        free(dico[i]);
-    free(dico);
+    back = loop(sys);
+    system_destroy(sys);
     return (back);
 }

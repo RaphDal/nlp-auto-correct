@@ -20,24 +20,28 @@
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
 
-#ifndef ALGORITHME_H_
-#define ALGORITHME_H_
-
-static const int inc_buff = 16;
-
-static const int dico_inc_buff = 65536;
+#ifndef SYSTEM_H_
+#define SYSTEM_H_
 
 #include <unistd.h>
-#include "system.h"
+#include <stdlib.h>
 
-size_t levenshtein_distance(char *word, char *compared, system_t *sys);
-size_t damerau_levenshtein_distance(char *a, char *b);
+typedef struct vector2ul
+{
+    int x;
+    int y;
+} vector2ul_t;
 
+typedef struct system
+{
+    vector2ul_t keyboard[26];
+    char **dictionnary;
+    size_t dictionnary_size;
+} system_t;
 
-char **get_dico(char *filepath);
+system_t *system_init(char *dictionnary_path, char *keyboard_type);
+void system_destroy(system_t *sys);
 
+int get_keyboard(char *type, system_t *sys);
 
-void exploit(char **tokens, system_t *sys);
-
-
-#endif /* !ALGORITHME_H_ */
+#endif /* !SYSTEM_H_ */
